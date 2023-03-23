@@ -37,18 +37,53 @@ class _HomeScreenState extends State<HomeScreen> {
         return MyAlertDialogbox(
           myController: _myController,
           onSave: saveNewHabit,
-          onCancel: cancelNewHbit,
+          onCancel: cancelHabit,
         );
       },
     );
   }
 
   //on save
-  saveNewHabit() {}
+  saveNewHabit() {
+    setState(() {
+      todaysHaibitList.add([_myController.text, false]);
+    });
+    Navigator.pop(context);
+    _myController.clear();
+  }
 
   //oncancel
-  cancelNewHbit() {
+  cancelHabit() {
     Navigator.pop(context);
+    _myController.clear();
+  }
+
+  //open habit to edit
+  void openHabit(int index) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return MyAlertDialogbox(
+            myController: _myController,
+            onSave: () => saveEditedHabit(index),
+            onCancel: cancelHabit,
+          );
+        });
+  }
+
+  //save Existing and edited habit
+
+  saveEditedHabit(index) {
+    setState(() {
+      todaysHaibitList[index[0]] = _myController;
+    });
+  }
+
+//delet habit
+  void deleteHabit(index) {
+    setState(() {
+      todaysHaibitList.removeAt(index);
+    });
   }
 
   @override
@@ -63,10 +98,11 @@ class _HomeScreenState extends State<HomeScreen> {
           itemCount: todaysHaibitList.length,
           itemBuilder: (context, index) {
             return HabitTile(
-              habitName: todaysHaibitList[index][0],
-              habitValue: todaysHaibitList[index][1],
-              changed: (newvalue) => checkBoxTapped(newvalue, index),
-            );
+                habitName: todaysHaibitList[index][0],
+                habitValue: todaysHaibitList[index][1],
+                changed: (newvalue) => checkBoxTapped(newvalue, index),
+                edit: (context) => openHabit(index),
+                delete: (context) => deleteHabit(index));
           },
         ));
   }
